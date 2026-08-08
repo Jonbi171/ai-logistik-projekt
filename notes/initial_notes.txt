@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+High-level architecture
+- External data sources:
+    - ERP
+    - WMS
+    - GPS
+    - IoT
+    - TmS
+    - Weather
+
+- Data integration layer
+    - API:s
+    - Streaming
+    - Data warehouse (ETL)
+    - Data lake
+
+- AI and analytics intelligence layer
+    - Demand forecasting
+    - ETA prediction
+    - Inventory optimization
+    - Risk detection
+    - Supplier performance scoring
+    - Route optimization
+    - Anomaly detection
+    - Root cause analysis
+    - Reinforcement learning (maybe)
+
+- Decision engine / digital twin
+    - Simulations
+    - What-if analysis
+    - Optimization
+    - Scenario planning
+
+- UI / dashboard
+    - Alerts
+    - KPIs
+    - Chatbot
+    - Reports
+    - Map
+
+---------------------------------------------------------------------------
+Core modules
+- Real-time visibility
+    - Shipment locations
+    - Warehouse Inventory
+    - Order status
+    - Vehicle status
+    - Supplier performance
+    - Port congestion
+    - Delayed orders
+
+- AI demand forecasting
+    - Historical sales
+    - Promotions
+    - Holidays
+    - Weather
+    - Economic indicators
+    - Social media trends
+    Possible models:
+        - XGBoost
+        - LSTM
+        - Temporal fusion transformer
+        - Prophet
+
+- Inventory optimization
+    - Safety stock
+    - Reorder points
+    - EOQ adjustments
+    - Service levels
+
+- ETA prediction 
+    - GPS
+    - Weather
+    - Traffic
+    - Customs delays
+    - Historical travel times
+    - Driver behaviour
+
+- Risk prediction
+
+- Intelligent alert engine
+    - Alerts based on business impact
+
+- Root cause analysis
+
+- Scenario simulator
+
+- Autonomous recommendations
+
+- Conversational AI assistant
+
+---------------------------------------------------------------------------
+ML models involved
+- Demand forecasting:
+    - LSTM, TFT, XGBoost
+- ETA prediction
+    - Gradient boosting
+- Delay prediction
+    - Random forest
+- Risk scooring
+    - XGBoost
+- Inventory optimization
+    - Reinforcement learning
+- Route optimization
+    - Genetic algorithm + RL
+- Anomaly detection
+    - Isolation forest
+- Supplier clustering
+    - K-means
+- Customer segmentation
+    - DBSCAN
+- Root cause discovery
+    - Graph Neural networks
+
+---------------------------------------------------------------------------
+Relevant KPI:s
+- OTIF (On Time In Full)
+- Fill Rate
+- Inventory Turnover
+- Days of Inventory
+- Order Cycle Time
+- Forecast Accuracy
+- transportation cost
+- Warehouse utilization
+- Carbon emissions
+- Supplier reliability
+- Perfect order Rate
