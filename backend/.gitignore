@@ -1,2 +1,3 @@
 /database/database.ini
 /database/models/raw_sql
+__pycache__/
