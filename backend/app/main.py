@@ -5,10 +5,11 @@ import backend.database.models as dbModels
 from backend.database.config import boot
 from fastapi import Depends, FastAPI
 from fastapi.responses import PlainTextResponse
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect, select, MetaData, Table
 from sqlalchemy.orm import Session
 
 engine, SessionLocal = boot()
+metadata = MetaData()
 app = FastAPI()
 
 def get_session() -> Generator[Session, None, None]:
@@ -60,3 +61,30 @@ def list_product_suppliers_by_order_cost(
         "The product suppliers have the following minimum order costs:\n"
         f"{costs}"
     )
+
+@app.get("/current-inventory", response_class=PlainTextResponse)
+def get_current_inventory(
+    session: Session = Depends(get_session),
+) -> str:
+
+    vw_current_inventory = Table(
+        "vw_current_inventory",
+        metadata,
+        schema="public",
+        autoload_with=engine,
+    )
+    
+    statement = select(vw_current_inventory).order_by(
+        vw_current_inventory.c.product_name,
+        vw_current_inventory.c.location_name,
+    ).where(
+        vw_current_inventory.c.inventory_status == "BELOW_REORDER_POINT"
+    )
+
+    rows = session.execute(statement).mappings().all()
+
+    inventories = "\n".join(
+        str(row) for row in rows
+    )
+
+    return f"{inventories}"
