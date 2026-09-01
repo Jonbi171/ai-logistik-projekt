@@ -1,3 +1,7 @@
 psycopg[binary]==3.3.4
 fastapi[standard]==0.112.0
 SQLAlchemy==2.0.43
+numpy==2.5.2
+matplotlib==3.11.1
+scikit-learn==1.9.0
+pandas==3.0.5
