@@ -10,6 +10,8 @@ from fastapi.responses import PlainTextResponse
 from sqlalchemy import String, and_, cast, func, inspect, select
 from sqlalchemy.orm import Session
 
+from models.linear_regression import train_transport_cost_model
+
 engine, SessionLocal = boot()
 views = reflect_views(engine)
 app = FastAPI()
@@ -730,3 +732,32 @@ def get_shipment_events(
         },
         metrics["total_records"],
     )
+
+############################################################
+# ML api routes start from here
+############################################################
+
+@app.get("/transport-costs-linreg-prediction")
+def predict_transport_costs_linreg(
+    session: Session = Depends(get_session),
+) -> dict:
+    statement = (
+        select(
+            dbModels.Shipments.total_weight_kg,
+            dbModels.Shipments.total_volume_m3,
+            dbModels.Shipments.distance_km,
+            dbModels.Shipments.transport_mode,
+            dbModels.Shipments.service_level,
+            dbModels.Shipments.carrier_id,
+            dbModels.Shipments.freight_cost_sek
+        )
+        .order_by(dbModels.Shipments.id)
+    )
+
+    rows = session.execute(statement).mappings().all()
+
+    results = train_transport_cost_model(rows)
+
+    return results["metrics"]
+
+
