@@ -95,6 +95,14 @@ def train_transport_cost_model(rows):
     results_df["predicted"] = y_pred
     results_df["absolute_error"] = np.abs(results_df["actual"] - results_df["predicted"])
 
+    air_results = results_df[
+        results_df["transport_mode"] == "AIR"
+    ]
+
+    air_mae = air_results["absolute_error"].mean()
+
+    
+
     return {
         "model": model,
         "metrics": {
