@@ -1,5 +1,9 @@
 # AI logistics project
 
+## NOTE ABOUT THIS BRANCH
+The purpose of this branch is to show the imagined end product for employers and interested parties. It is not a means of vibecoding the designated final version of the application. 
+The goal is still to do the work myself with AI assistance, rather than to finish at a vibe-coded version.
+Nevertheless, this can be thought of as how the final product will look, including the actual dashboard.
 ## Start the application
 
 From the project root, run:
