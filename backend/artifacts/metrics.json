@@ -1,0 +1,1119 @@
+[
+  {
+    "id": "delay",
+    "name": "Shipment delay risk",
+    "model": "RandomForestClassifier",
+    "purpose": "Predict lateness before departure to review delivery commitments.",
+    "target": "target_late",
+    "features": [
+      "total_weight_kg",
+      "total_volume_m3",
+      "distance_km",
+      "planned_transit_hours",
+      "weekday",
+      "month",
+      "transport_mode",
+      "service_level",
+      "carrier_id",
+      "origin_location_id",
+      "destination_location_id"
+    ],
+    "observations": 12000,
+    "train_rows": 9499,
+    "test_rows": 2411,
+    "cutoff": "2026-02-12T09:00:00+00:00",
+    "metrics": {
+      "accuracy": 0.6578183326420572,
+      "precision": 0.4745762711864407,
+      "recall": 0.06837606837606838,
+      "f1": 0.11953041622198506,
+      "roc_auc": 0.5520516962099877,
+      "brier_score": 0.2225870181516239,
+      "confusion_matrix": [
+        [
+          1530,
+          62
+        ],
+        [
+          763,
+          56
+        ]
+      ]
+    },
+    "comparison": {
+      "model": "LogisticRegression",
+      "metrics": {
+        "accuracy": 0.6594773952716715,
+        "precision": 0.4915254237288136,
+        "recall": 0.07081807081807082,
+        "f1": 0.12379935965848453,
+        "roc_auc": 0.5632251612151109,
+        "brier_score": 0.2215081622843431,
+        "confusion_matrix": [
+          [
+            1532,
+            60
+          ],
+          [
+            761,
+            58
+          ]
+        ]
+      }
+    },
+    "importance": [
+      {
+        "feature": "total_weight_kg",
+        "importance": 0.17199698880351796
+      },
+      {
+        "feature": "total_volume_m3",
+        "importance": 0.17124095480987156
+      },
+      {
+        "feature": "month",
+        "importance": 0.09331681704564852
+      },
+      {
+        "feature": "planned_transit_hours",
+        "importance": 0.09321393540197097
+      },
+      {
+        "feature": "weekday",
+        "importance": 0.09008031225216503
+      },
+      {
+        "feature": "distance_km",
+        "importance": 0.059848156691517385
+      },
+      {
+        "feature": "carrier_id_ea4b06db-c12d-517d-a85d-e0fdae83540e",
+        "importance": 0.04842810987490745
+      },
+      {
+        "feature": "destination_location_id_d2826708-a381-57a4-b0ea-393dc97a0f78",
+        "importance": 0.04756656432260801
+      },
+      {
+        "feature": "carrier_id_33672d6f-af30-504e-8807-e64b503dd21b",
+        "importance": 0.045201534999229534
+      },
+      {
+        "feature": "origin_location_id_823e5415-f865-55b3-b64b-379aa76c1f40",
+        "importance": 0.012234613435212899
+      }
+    ],
+    "reason": "Random forest captures route and service interactions; compared with logistic regression.",
+    "validation": "Chronological 80/20 split by planned departure; training outcomes after cutoff purged. Serving retains this evaluated model.",
+    "samples": [
+      {
+        "actual": 0.0,
+        "predicted": 0.33719686273203714
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.29760694458830234
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.3626903244267998
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.293135332575464
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.36401148543796447
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.33506758709586865
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.31124770745160857
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.29017450707089076
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.31098134953599954
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.36601357242955174
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.2529749442449262
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3806793331092228
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3169879483034206
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.37611721717468705
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.28680533967525507
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.365333374726148
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.3898676757995145
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.580841545257974
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.5448718190036648
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.40404872628354255
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.38643522001939523
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.31712540428858016
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.24492965844802014
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.4012458783017995
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.382911083353564
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.2866718675441776
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3461609306575789
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2646849286219603
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2746113300363088
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.36156126712691217
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3434334660903982
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3930515816904168
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.36114621332718994
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.40470143667636077
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.28537529282515317
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.3633845120208834
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.3288428819296317
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.5639540742790843
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.5465203041703321
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.44250810933898993
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.52396572812999
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.5945081224629407
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.28620449173363943
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.34540911727740353
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3638211336429172
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.2786913072403929
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2633432825080157
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2966802644783902
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.2790343341029454
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.25931190782740476
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3151597433225746
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.3249660326812815
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2933519376834501
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.26214044954101134
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2758267361281561
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.28948952977773584
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.35548768726448804
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.2830544077278154
+      },
+      {
+        "actual": 1.0,
+        "predicted": 0.3268194862142084
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.47084283725456927
+      }
+    ],
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  },
+  {
+    "id": "eta",
+    "name": "Delay / ETA",
+    "model": "RandomForestRegressor",
+    "purpose": "Estimate positive delay hours beyond planned arrival.",
+    "target": "target_delay",
+    "features": [
+      "total_weight_kg",
+      "total_volume_m3",
+      "distance_km",
+      "planned_transit_hours",
+      "weekday",
+      "month",
+      "transport_mode",
+      "service_level",
+      "carrier_id",
+      "origin_location_id",
+      "destination_location_id"
+    ],
+    "observations": 12000,
+    "train_rows": 9499,
+    "test_rows": 2411,
+    "cutoff": "2026-02-12T09:00:00+00:00",
+    "metrics": {
+      "mae": 4.713408347208295,
+      "rmse": 10.172982836631205,
+      "r2": 0.25972301226549677
+    },
+    "comparison": null,
+    "importance": [
+      {
+        "feature": "destination_location_id_d2826708-a381-57a4-b0ea-393dc97a0f78",
+        "importance": 0.6919132108649583
+      },
+      {
+        "feature": "total_weight_kg",
+        "importance": 0.09688779712747965
+      },
+      {
+        "feature": "total_volume_m3",
+        "importance": 0.07355045983139928
+      },
+      {
+        "feature": "month",
+        "importance": 0.0421548702804851
+      },
+      {
+        "feature": "planned_transit_hours",
+        "importance": 0.03660634319660711
+      },
+      {
+        "feature": "weekday",
+        "importance": 0.03278714389248221
+      },
+      {
+        "feature": "distance_km",
+        "importance": 0.0070812295009211245
+      },
+      {
+        "feature": "carrier_id_ea4b06db-c12d-517d-a85d-e0fdae83540e",
+        "importance": 0.0057275695112829
+      },
+      {
+        "feature": "origin_location_id_3b627414-1a7c-550b-a56f-ae22f91e3240",
+        "importance": 0.0031132078883747125
+      },
+      {
+        "feature": "origin_location_id_532fd288-6e94-5133-bc07-d21fdf891bd9",
+        "importance": 0.002245437458513713
+      }
+    ],
+    "reason": "Random forest handles nonlinear delay patterns without external dependencies.",
+    "validation": "Chronological 80/20 split by planned departure; training outcomes after cutoff purged. Serving retains this evaluated model.",
+    "samples": [
+      {
+        "actual": 0.0,
+        "predicted": 2.1992238395531474
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.1037926083404
+      },
+      {
+        "actual": 1.0166666666666666,
+        "predicted": 1.4821310431945827
+      },
+      {
+        "actual": 1.4666666666666666,
+        "predicted": 0.8576913497384404
+      },
+      {
+        "actual": 47.36666666666667,
+        "predicted": 2.8705131008312526
+      },
+      {
+        "actual": 43.36666666666667,
+        "predicted": 1.9500242369323575
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.4587900460889596
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.1688340903713481
+      },
+      {
+        "actual": 1.35,
+        "predicted": 0.7861986338678825
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.510129833752539
+      },
+      {
+        "actual": 0.7333333333333333,
+        "predicted": 0.8331189031738789
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.040389656509837
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.4331245262730896
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.0953200503188443
+      },
+      {
+        "actual": 25.0,
+        "predicted": 0.8707193533979266
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.02750145808584
+      },
+      {
+        "actual": 16.783333333333335,
+        "predicted": 2.312008611941471
+      },
+      {
+        "actual": 72.0,
+        "predicted": 32.112538386051554
+      },
+      {
+        "actual": 0.0,
+        "predicted": 29.483141055256585
+      },
+      {
+        "actual": 24.0,
+        "predicted": 16.68481463886757
+      },
+      {
+        "actual": 0.0,
+        "predicted": 3.6906090538715373
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.8632351108197192
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.9169506166616893
+      },
+      {
+        "actual": 1.0333333333333334,
+        "predicted": 2.562801655322471
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.9000786088618697
+      },
+      {
+        "actual": 0.016666666666666666,
+        "predicted": 0.8199572197226314
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.385691284351499
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.8810872672826814
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.1540289978430498
+      },
+      {
+        "actual": 14.166666666666666,
+        "predicted": 3.12088880675074
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.3269322371341077
+      },
+      {
+        "actual": 0.0,
+        "predicted": 3.301878017327431
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.995329005310643
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.3351520574132265
+      },
+      {
+        "actual": 1.9,
+        "predicted": 1.441358245839933
+      },
+      {
+        "actual": 1.7,
+        "predicted": 2.6712876386622786
+      },
+      {
+        "actual": 4.316666666666666,
+        "predicted": 2.275186970522251
+      },
+      {
+        "actual": 0.0,
+        "predicted": 33.12571927958833
+      },
+      {
+        "actual": 0.0,
+        "predicted": 31.87742034458304
+      },
+      {
+        "actual": 0.0,
+        "predicted": 25.994401947377938
+      },
+      {
+        "actual": 24.0,
+        "predicted": 34.84552100436636
+      },
+      {
+        "actual": 0.0,
+        "predicted": 34.45580729289557
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.9615130902581777
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.6324107280679394
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.217756676403194
+      },
+      {
+        "actual": 0.7666666666666667,
+        "predicted": 1.0587766641685776
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.942970105777747
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.7543328876286097
+      },
+      {
+        "actual": 0.9,
+        "predicted": 1.2117747170947586
+      },
+      {
+        "actual": 0.35,
+        "predicted": 0.7569868943876108
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.650055713324951
+      },
+      {
+        "actual": 0.0,
+        "predicted": 2.3970347697469325
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.8473072475724245
+      },
+      {
+        "actual": 6.283333333333333,
+        "predicted": 0.8008372675136218
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.367637614673223
+      },
+      {
+        "actual": 0.0,
+        "predicted": 1.1659529881016468
+      },
+      {
+        "actual": 12.866666666666667,
+        "predicted": 1.940330165584925
+      },
+      {
+        "actual": 0.0,
+        "predicted": 0.5177898773499778
+      },
+      {
+        "actual": 24.0,
+        "predicted": 12.003298617357663
+      },
+      {
+        "actual": 0.0,
+        "predicted": 32.44219032492978
+      }
+    ],
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  },
+  {
+    "id": "cost",
+    "name": "Freight cost",
+    "model": "LinearRegression",
+    "purpose": "Estimate transport spend and compare planning scenarios.",
+    "target": "freight_cost_sek",
+    "features": [
+      "total_weight_kg",
+      "total_volume_m3",
+      "distance_km",
+      "transport_mode",
+      "service_level",
+      "carrier_id"
+    ],
+    "observations": 12000,
+    "train_rows": 9499,
+    "test_rows": 2411,
+    "cutoff": "2026-02-12T09:00:00+00:00",
+    "metrics": {
+      "mae": 42.70523591633414,
+      "rmse": 62.74087106253308,
+      "r2": 0.991389778742333
+    },
+    "comparison": {
+      "model": "RandomForestRegressor",
+      "metrics": {
+        "mae": 0.2077000493828659,
+        "rmse": 0.9444958268009647,
+        "r2": 0.9999980487482276
+      }
+    },
+    "importance": [
+      {
+        "feature": "distance_km",
+        "importance": 948.7142474341385
+      },
+      {
+        "feature": "carrier_id_4cbd6bdf-6622-5ec6-b94f-889e7751587d",
+        "importance": 613.1261851301879
+      },
+      {
+        "feature": "transport_mode_OCEAN",
+        "importance": 613.1261851301877
+      },
+      {
+        "feature": "transport_mode_ROAD",
+        "importance": 391.9365002195729
+      },
+      {
+        "feature": "carrier_id_33672d6f-af30-504e-8807-e64b503dd21b",
+        "importance": 253.22014489809996
+      },
+      {
+        "feature": "transport_mode_AIR",
+        "importance": 221.18968491061787
+      },
+      {
+        "feature": "service_level_EXPRESS",
+        "importance": 221.1896849106166
+      },
+      {
+        "feature": "service_level_STANDARD",
+        "importance": 221.1896849106166
+      },
+      {
+        "feature": "carrier_id_978e5a2b-d3a7-58dd-be9e-b3cfd3ee8536",
+        "importance": 221.1896849106166
+      },
+      {
+        "feature": "carrier_id_ea4b06db-c12d-517d-a85d-e0fdae83540e",
+        "importance": 138.7163553214777
+      }
+    ],
+    "reason": "Linear regression retains the existing explainable cost-model direction; tree comparison is reported.",
+    "validation": "Chronological 80/20 split by planned departure; training outcomes after cutoff purged. Serving retains this evaluated model.",
+    "samples": [
+      {
+        "actual": 130.41,
+        "predicted": 97.5393205065437
+      },
+      {
+        "actual": 425.67,
+        "predicted": 415.8027189290048
+      },
+      {
+        "actual": 98.82,
+        "predicted": 154.0275349960123
+      },
+      {
+        "actual": 477.15,
+        "predicted": 457.8762462145365
+      },
+      {
+        "actual": 426.13,
+        "predicted": 408.6377740364398
+      },
+      {
+        "actual": 241.39,
+        "predicted": 213.6068209815753
+      },
+      {
+        "actual": 456.23,
+        "predicted": 439.65385453015944
+      },
+      {
+        "actual": 426.15,
+        "predicted": 416.02455764195855
+      },
+      {
+        "actual": 424.1,
+        "predicted": 416.1060206925866
+      },
+      {
+        "actual": 524.46,
+        "predicted": 563.7954688374691
+      },
+      {
+        "actual": 235.84,
+        "predicted": 261.73076816426783
+      },
+      {
+        "actual": 129.06,
+        "predicted": 95.30994428449637
+      },
+      {
+        "actual": 455.01,
+        "predicted": 439.86909640438654
+      },
+      {
+        "actual": 130.87,
+        "predicted": 97.35097481428616
+      },
+      {
+        "actual": 311.06,
+        "predicted": 324.77466725216254
+      },
+      {
+        "actual": 171.59,
+        "predicted": 140.26851573552605
+      },
+      {
+        "actual": 239.25,
+        "predicted": 210.16007424600141
+      },
+      {
+        "actual": 3845.91,
+        "predicted": 3854.819012416014
+      },
+      {
+        "actual": 440.23,
+        "predicted": 575.489143444714
+      },
+      {
+        "actual": 176.37,
+        "predicted": 185.2317514278632
+      },
+      {
+        "actual": 464.04,
+        "predicted": 447.7114260345871
+      },
+      {
+        "actual": 112.79,
+        "predicted": 77.90841587196311
+      },
+      {
+        "actual": 382.8,
+        "predicted": 494.01837679050465
+      },
+      {
+        "actual": 75.85,
+        "predicted": 39.28810740244299
+      },
+      {
+        "actual": 238.67,
+        "predicted": 210.23324705624108
+      },
+      {
+        "actual": 149.9,
+        "predicted": 191.57968922179728
+      },
+      {
+        "actual": 410.63,
+        "predicted": 391.56377433168166
+      },
+      {
+        "actual": 103.76,
+        "predicted": 153.2868306349889
+      },
+      {
+        "actual": 428.68,
+        "predicted": 415.418960989788
+      },
+      {
+        "actual": 351.14,
+        "predicted": 326.07748562904885
+      },
+      {
+        "actual": 365.35,
+        "predicted": 343.40436606966784
+      },
+      {
+        "actual": 463.11,
+        "predicted": 447.8327008475482
+      },
+      {
+        "actual": 171.23,
+        "predicted": 140.18968488678175
+      },
+      {
+        "actual": 238.27,
+        "predicted": 210.23204897433553
+      },
+      {
+        "actual": 426.09,
+        "predicted": 415.68849352195724
+      },
+      {
+        "actual": 324.36,
+        "predicted": 301.3852218902374
+      },
+      {
+        "actual": 114.4,
+        "predicted": 77.45013107263438
+      },
+      {
+        "actual": 183.94,
+        "predicted": 190.17227127611787
+      },
+      {
+        "actual": 438.69,
+        "predicted": 576.2989724661224
+      },
+      {
+        "actual": 498.34,
+        "predicted": 694.1109667084036
+      },
+      {
+        "actual": 508.4,
+        "predicted": 705.2707188044171
+      },
+      {
+        "actual": 3846.51,
+        "predicted": 3853.9707869925514
+      },
+      {
+        "actual": 168.04,
+        "predicted": 210.06558695942792
+      },
+      {
+        "actual": 240.32,
+        "predicted": 213.44499349328595
+      },
+      {
+        "actual": 171.65,
+        "predicted": 140.14518033104932
+      },
+      {
+        "actual": 316.97,
+        "predicted": 327.63022661759135
+      },
+      {
+        "actual": 101.55,
+        "predicted": 153.42913677868526
+      },
+      {
+        "actual": 476.41,
+        "predicted": 458.2035818866257
+      },
+      {
+        "actual": 315.89,
+        "predicted": 327.65400140234726
+      },
+      {
+        "actual": 99.02,
+        "predicted": 154.14868382294608
+      },
+      {
+        "actual": 114.41,
+        "predicted": 77.08495851210373
+      },
+      {
+        "actual": 566.79,
+        "predicted": 531.3113934307935
+      },
+      {
+        "actual": 909.43,
+        "predicted": 745.690364004206
+      },
+      {
+        "actual": 98.81,
+        "predicted": 154.12122153040164
+      },
+      {
+        "actual": 225.6,
+        "predicted": 254.54938957430025
+      },
+      {
+        "actual": 429.43,
+        "predicted": 415.1522806060097
+      },
+      {
+        "actual": 132.0,
+        "predicted": 97.13247348770793
+      },
+      {
+        "actual": 628.1,
+        "predicted": 577.2725142563024
+      },
+      {
+        "actual": 506.88,
+        "predicted": 707.9404776847159
+      },
+      {
+        "actual": 497.16,
+        "predicted": 693.4439749641542
+      }
+    ],
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  },
+  {
+    "id": "supplier",
+    "name": "Supplier delivery risk",
+    "model": "LogisticRegression",
+    "purpose": "Flag purchase orders likely to miss the originally requested date.",
+    "target": "actual_delivery_date > requested_delivery_date",
+    "features": [
+      "total_value_sek",
+      "planned_lead_days",
+      "weekday",
+      "month",
+      "supplier_id",
+      "destination_location_id"
+    ],
+    "observations": 1200,
+    "train_rows": 926,
+    "test_rows": 240,
+    "cutoff": "2026-01-21T04:48:00+00:00",
+    "metrics": {
+      "accuracy": 0.6625,
+      "precision": 0.6625,
+      "recall": 1.0,
+      "f1": 0.7969924812030075,
+      "roc_auc": 0.5070269430856433,
+      "brier_score": 0.22520878587568158,
+      "confusion_matrix": [
+        [
+          0,
+          81
+        ],
+        [
+          0,
+          159
+        ]
+      ]
+    },
+    "comparison": null,
+    "importance": [
+      {
+        "feature": "supplier_id_c66c904c-5751-5780-b790-3cd00cf0235c",
+        "importance": 0.4128294925764357
+      },
+      {
+        "feature": "supplier_id_5962c27b-fd5b-5bc5-b7f0-711a7dbd3056",
+        "importance": 0.21326492981353606
+      },
+      {
+        "feature": "planned_lead_days",
+        "importance": 0.20546904176880468
+      },
+      {
+        "feature": "supplier_id_97a7ed39-c801-5f4f-9057-be46ddd106e1",
+        "importance": 0.14284898164338622
+      },
+      {
+        "feature": "supplier_id_fa7b3c4f-e1c1-5f34-a90a-ae51b7134cf4",
+        "importance": 0.1206803298946661
+      },
+      {
+        "feature": "month",
+        "importance": 0.07217603445045806
+      },
+      {
+        "feature": "supplier_id_7a0ba344-506b-581a-9f7d-dc3d28d09d7f",
+        "importance": 0.06377450361663932
+      },
+      {
+        "feature": "weekday",
+        "importance": 0.010524729547043067
+      },
+      {
+        "feature": "total_value_sek",
+        "importance": 0.0019273850646326397
+      },
+      {
+        "feature": "destination_location_id_d2826708-a381-57a4-b0ea-393dc97a0f78",
+        "importance": 0.00019024515850883355
+      }
+    ],
+    "reason": "An interpretable baseline for the smaller purchase-order dataset.",
+    "validation": "Chronological split by order date; only outcomes available before cutoff train the model. Final confirmed dates are not features.",
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  },
+  {
+    "id": "anomaly",
+    "name": "Operational anomalies",
+    "model": "IsolationForest",
+    "purpose": "Prioritize unusual completed shipments for investigation; unusual does not mean incorrect.",
+    "target": "Unsupervised isolation score",
+    "features": [
+      "freight_cost_sek",
+      "distance_km",
+      "total_weight_kg",
+      "total_volume_m3",
+      "target_delay"
+    ],
+    "observations": 12000,
+    "train_rows": 9499,
+    "test_rows": 2411,
+    "metrics": {
+      "holdout_flag_rate": 0.0452094566569888
+    },
+    "comparison": null,
+    "importance": [],
+    "reason": "Detects unusual combinations of cost, load, distance and realized delay.",
+    "validation": "Fits historical training period; reports flagged share on chronological holdout. Contamination 4% is a sensitivity setting, not measured accuracy.",
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  },
+  {
+    "id": "demand",
+    "name": "SKU demand forecast",
+    "model": "Validated statistical baselines",
+    "purpose": "Translate sales demand into a four-week supply requirement.",
+    "target": "Weekly ordered units by SKU",
+    "features": [
+      "order_date",
+      "ordered_quantity",
+      "product_id"
+    ],
+    "observations": 23106,
+    "train_rows": 2256,
+    "test_rows": 192,
+    "metrics": {
+      "wape": 0.350602061596658
+    },
+    "comparison": null,
+    "importance": [],
+    "reason": "Last value, moving average and exponential smoothing are credible benchmarks for this history.",
+    "validation": "Inner four-week model selection; final eight complete weeks are an untouched fixed-origin test, then refit for future forecasts.",
+    "trained_at": "2026-09-20T20:20:52.598562+00:00"
+  }
+]
