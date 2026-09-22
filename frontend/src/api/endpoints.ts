@@ -13,7 +13,6 @@ export const API_ENDPOINTS = {
   shipmentEvents: endpoint('/shipment-events'),
   productSuppliers: endpoint('/product-suppliers'),
   productSuppliersOrderCost: endpoint('/product-suppliers-order-cost'),
-  
 } as const
 
 export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS]

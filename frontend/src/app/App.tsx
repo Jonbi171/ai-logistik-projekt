@@ -1,390 +1,284 @@
-import { useEffect, useMemo, useState } from 'react'
-import { fetchDashboard } from '../api/dashboard'
-import { API_ENDPOINTS, type ApiEndpoint } from '../api/endpoints'
-import type { ApiValue, DashboardResponse } from '../api/types'
+import { lazy, Suspense, useCallback, useState } from 'react'
+import {
+  Activity,
+  ArrowUpRight,
+  Boxes,
+  BrainCircuit,
+  ChevronRight,
+  Database,
+  Factory,
+  FlaskConical,
+  LayoutDashboard,
+  Menu,
+  Package,
+  Truck,
+  Users,
+  X,
+} from 'lucide-react'
+import type { Overview as OverviewData, Exception, Page } from '../api/tower'
+import { State } from '../components/ui'
+import { useMediaQuery, useModal } from '../components/responsive'
+import { useData, date } from '../components/data'
+const Overview = lazy(() => import('../pages/Overview').then((m) => ({ default: m.Overview })))
+const Transportation = lazy(() =>
+  import('../pages/Transportation').then((m) => ({ default: m.Transportation })),
+)
+const Inventory = lazy(() => import('../pages/Inventory').then((m) => ({ default: m.Inventory })))
+const Demand = lazy(() => import('../pages/Demand').then((m) => ({ default: m.Demand })))
+const Production = lazy(() => import('../pages/Supply').then((m) => ({ default: m.Production })))
+const Suppliers = lazy(() => import('../pages/Supply').then((m) => ({ default: m.Suppliers })))
+const Models = lazy(() => import('../pages/Models').then((m) => ({ default: m.Models })))
+const Scenarios = lazy(() => import('../pages/Scenarios').then((m) => ({ default: m.Scenarios })))
 import './App.css'
+import './mobile.css'
 
-type DashboardId =
-  | 'inventory'
-  | 'shipments'
-  | 'sales'
-  | 'purchasing'
-  | 'movements'
-  | 'bom'
-  | 'suppliers'
-  | 'tracking'
-
-type Column = {
-  label: string
-  path: string
-  tone?: boolean
-}
-
-type DashboardConfig = {
-  eyebrow: string
-  title: string
-  description: string
-  endpoint: ApiEndpoint
-  columns: Column[]
-}
-
-const dashboards: Record<DashboardId, DashboardConfig> = {
-  inventory: {
-    eyebrow: 'Inventory',
-    title: 'Inventory overview',
-    description: 'Live stock position and availability across every location.',
-    endpoint: API_ENDPOINTS.currentInventory,
-    columns: [
-      { label: 'SKU', path: 'product.sku' },
-      { label: 'Product', path: 'product.name' },
-      { label: 'Location', path: 'location.name' },
-      { label: 'Available', path: 'quantities.available' },
-      { label: 'On hand', path: 'quantities.on_hand' },
-      { label: 'Status', path: 'status', tone: true },
-    ],
+const pages: { name: Page; icon: typeof Activity; group: string; description: string }[] = [
+  {
+    name: 'Control Tower',
+    icon: LayoutDashboard,
+    group: 'WORKSPACE',
+    description: 'Delivery history, inventory coverage and exceptions to review.',
   },
-  shipments: {
-    eyebrow: 'Logistics',
-    title: 'Shipment performance',
-    description: 'Follow active shipments, delays, carriers and current ETAs.',
-    endpoint: API_ENDPOINTS.shipmentOverview,
-    columns: [
-      { label: 'Shipment', path: 'shipment_number' },
-      { label: 'Origin', path: 'route.origin.name' },
-      { label: 'Destination', path: 'route.destination.name' },
-      { label: 'Carrier', path: 'transport.carrier' },
-      { label: 'ETA', path: 'schedule.current_eta' },
-      { label: 'Status', path: 'status', tone: true },
-    ],
+  {
+    name: 'Transportation',
+    icon: Truck,
+    group: '',
+    description: 'Review shipments, delivery estimates and freight costs.',
   },
-  sales: {
-    eyebrow: 'Orders',
-    title: 'Sales order fulfillment',
-    description: 'Monitor customer orders, remaining quantities and fulfillment.',
-    endpoint: API_ENDPOINTS.salesOrderOverview,
-    columns: [
-      { label: 'Order', path: 'order.number' },
-      { label: 'Customer', path: 'order.customer' },
-      { label: 'Product', path: 'line.product_name' },
-      { label: 'Ordered', path: 'line.ordered' },
-      { label: 'Remaining', path: 'line.remaining' },
-      { label: 'Status', path: 'order.status', tone: true },
-    ],
+  {
+    name: 'Inventory',
+    icon: Boxes,
+    group: '',
+    description: 'Connect inventory coverage to forecast demand and incoming supply.',
   },
-  purchasing: {
-    eyebrow: 'Orders',
-    title: 'Purchase order performance',
-    description: 'Review inbound orders, supplier lead times and on-time delivery.',
-    endpoint: API_ENDPOINTS.purchaseOrderOverview,
-    columns: [
-      { label: 'Purchase order', path: 'purchase_order.number' },
-      { label: 'Supplier', path: 'supplier.name' },
-      { label: 'Product', path: 'line.product_name' },
-      { label: 'Outstanding', path: 'line.outstanding' },
-      { label: 'Destination', path: 'destination' },
-      { label: 'Status', path: 'purchase_order.status', tone: true },
-    ],
+  {
+    name: 'Demand',
+    icon: Activity,
+    group: '',
+    description: 'Compare demand history, forecasts and holdout results.',
   },
-  movements: {
-    eyebrow: 'Inventory',
-    title: 'Inventory movement history',
-    description: 'Trace stock changes, reasons and linked logistics documents.',
-    endpoint: API_ENDPOINTS.inventoryHistory,
-    columns: [
-      { label: 'Time', path: 'event_timestamp' },
-      { label: 'Product', path: 'product.name' },
-      { label: 'Location', path: 'location.name' },
-      { label: 'Movement', path: 'movement.type', tone: true },
-      { label: 'Quantity', path: 'movement.quantity' },
-      { label: 'Reason', path: 'movement.reason' },
-    ],
+  {
+    name: 'Suppliers',
+    icon: Users,
+    group: '',
+    description: 'Compare supplier reliability, lead times, and quality.',
   },
-  bom: {
-    eyebrow: 'Planning',
-    title: 'Bill of materials',
-    description: 'Explore component relationships and material requirements.',
-    endpoint: API_ENDPOINTS.productBom,
-    columns: [
-      { label: 'Finished product', path: 'finished_product.name' },
-      { label: 'Component', path: 'component.name' },
-      { label: 'Quantity', path: 'material_requirement.quantity' },
-      { label: 'With scrap', path: 'material_requirement.quantity_including_scrap' },
-      { label: 'Unit', path: 'component.unit_of_measure' },
-      { label: 'Version', path: 'bom_version' },
-    ],
+  {
+    name: 'Production',
+    icon: Factory,
+    group: '',
+    description: 'Understand output, capacity utilization, and production performance.',
   },
-  suppliers: {
-    eyebrow: 'Suppliers',
-    title: 'Product suppliers',
-    description: 'Compare sourcing terms, supplier risk and contracted capacity.',
-    endpoint: API_ENDPOINTS.productSupplierOverview,
-    columns: [
-      { label: 'Product', path: 'product.name' },
-      { label: 'Supplier', path: 'supplier.name' },
-      { label: 'Risk', path: 'supplier.risk_tier', tone: true },
-      { label: 'Unit cost', path: 'commercial_terms.unit_cost_sek' },
-      { label: 'Lead time', path: 'commercial_terms.lead_time_days' },
-      { label: 'Preferred', path: 'supplier.preferred', tone: true },
-    ],
+  {
+    name: 'AI / ML Insights',
+    icon: BrainCircuit,
+    group: 'INTELLIGENCE',
+    description: 'Inspect training data, evaluation results and model limitations.',
   },
-  tracking: {
-    eyebrow: 'Logistics',
-    title: 'Shipment event tracking',
-    description: 'See the latest milestones reported throughout each journey.',
-    endpoint: API_ENDPOINTS.shipmentEvents,
-    columns: [
-      { label: 'Shipment', path: 'shipment_number' },
-      { label: 'Event', path: 'event.type' },
-      { label: 'Status', path: 'event.status_code', tone: true },
-      { label: 'Location', path: 'location.name' },
-      { label: 'City', path: 'location.city' },
-      { label: 'Time', path: 'event.timestamp' },
-    ],
+  {
+    name: 'Scenario Analysis',
+    icon: FlaskConical,
+    group: '',
+    description: 'Compare changes to freight cost, delivery risk and stock coverage.',
   },
-}
-
-const menuGroups: { label: string; items: DashboardId[] }[] = [
-  { label: 'Inventory', items: ['inventory', 'movements'] },
-  { label: 'Orders', items: ['sales', 'purchasing'] },
-  { label: 'Logistics', items: ['shipments', 'tracking'] },
-  { label: 'Supply', items: ['suppliers', 'bom'] },
 ]
-
-const formatLabel = (key: string) =>
-  key
-    .replace(/_percent$/, '')
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
-
-const formatDate = (value: string) => {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime()) || !value.match(/^\d{4}-\d{2}-\d{2}/)) return value
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    ...(value.includes('T') ? { hour: '2-digit', minute: '2-digit' } : {}),
-  }).format(date)
+function pageLabel(page: Page): string {
+  return page
+    .replace('Control Tower', 'Control tower')
+    .replace('AI / ML Insights', 'AI / ML insights')
+    .replace('Scenario Analysis', 'Scenario analysis')
 }
-
-const formatValue = (value: unknown, key = ''): string => {
-  if (value === null || value === undefined || value === '') return '—'
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
-  if (typeof value === 'number') {
-    const formatted = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 2 }).format(value)
-    if (key.includes('percent')) return `${formatted}%`
-    if (key.includes('sek')) return `${formatted} SEK`
-    return formatted
-  }
-  if (typeof value === 'object') {
-    return Object.entries(value)
-      .map(([label, amount]) => `${formatLabel(label)} ${String(amount)}`)
-      .join(' · ')
-  }
-  return formatDate(String(value))
+function initialPage(): Page {
+  const requested = decodeURIComponent(window.location.hash.slice(1))
+  return pages.some((p) => p.name === requested) ? (requested as Page) : 'Control Tower'
 }
-
-const getValue = (row: Record<string, unknown>, path: string): unknown =>
-  path.split('.').reduce<unknown>((value, key) => {
-    if (typeof value !== 'object' || value === null) return undefined
-    return (value as Record<string, unknown>)[key]
-  }, row)
-
-const metricEntries = (summary: Record<string, ApiValue>) =>
-  Object.entries(summary)
-    .filter(([key]) => !key.endsWith('_definition') && key !== 'returned_records')
-    .slice(0, 4)
-
-function Mark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-    </span>
-  )
-}
-
 function App() {
-  const [activeId, setActiveId] = useState<DashboardId>('inventory')
-  const [data, setData] = useState<DashboardResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const config = dashboards[activeId]
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    fetchDashboard(config.endpoint, controller.signal)
-      .then((response) => {
-        setData(response)
-        setLastUpdated(new Date())
-      })
-      .catch((requestError: unknown) => {
-        if (requestError instanceof DOMException && requestError.name === 'AbortError') return
-        setData(null)
-        setError(requestError instanceof Error ? requestError.message : 'Unable to load dashboard data')
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-
-    return () => controller.abort()
-  }, [config.endpoint, refreshKey])
-
-  const metrics = useMemo(() => (data ? metricEntries(data.summary) : []), [data])
-
-  const chooseDashboard = (id: DashboardId) => {
-    if (id !== activeId) {
-      setLoading(true)
-      setError(null)
-    }
-    setActiveId(id)
-    document.querySelectorAll<HTMLDetailsElement>('.nav-dropdown[open]').forEach((menu) => {
-      menu.open = false
-    })
-  }
-
-  const refreshDashboard = () => {
-    setLoading(true)
-    setError(null)
-    setRefreshKey((key) => key + 1)
-  }
-
+  const [page, setPage] = useState<Page>(initialPage),
+    [reference, setReference] = useState<string | undefined>(),
+    [menu, setMenu] = useState(false)
+  const overview = useData<OverviewData>('/tower/overview'),
+    exceptions = useData<{ items: Exception[] }>('/tower/exceptions')
+  const config = pages.find((p) => p.name === page)!
+  const navigate = useCallback((p: Page, ref?: string) => {
+    setPage(p)
+    setReference(ref)
+    setMenu(false)
+    window.history.replaceState(null, '', `#${encodeURIComponent(p)}`)
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [])
+  const mobile = useMediaQuery('(max-width: 760px)')
+  const mobileMenu = mobile && menu
+  const closeMenu = useCallback(() => setMenu(false), [])
+  const menuRef = useModal(mobileMenu, closeMenu)
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <button className="brand" type="button" onClick={() => chooseDashboard('inventory')}>
-          <Mark />
-          <span>BillgerICT</span>
+      <aside
+        ref={menuRef}
+        id="workspace-navigation"
+        className={`sidebar ${mobileMenu ? 'open' : ''}`}
+        inert={mobile && !mobileMenu}
+        role={mobileMenu ? 'dialog' : undefined}
+        aria-modal={mobileMenu ? true : undefined}
+        aria-label={mobileMenu ? 'Workspace navigation' : undefined}
+      >
+        <a
+          href="#Control%20Tower"
+          className="brand"
+          onClick={(e) => {
+            e.preventDefault()
+            navigate('Control Tower')
+          }}
+        >
+          <span className="brand-symbol">B</span>
+          <div>
+            BillgerICT<span>Intelligent control tower</span>
+          </div>
+        </a>
+        <button
+          className="mobile-close icon-button"
+          aria-label="Close menu"
+          data-modal-close
+          onClick={() => setMenu(false)}
+        >
+          <X />
         </button>
-
-        <nav className="main-nav" aria-label="KPI dashboards">
-          {menuGroups.map((group) => (
-            <details className="nav-dropdown" key={group.label}>
-              <summary>
-                {group.label}
-                <span className="chevron" aria-hidden="true">⌄</span>
-              </summary>
-              <div className="dropdown-menu">
-                <span className="dropdown-caption">KPI displays</span>
-                {group.items.map((id) => (
-                  <button
-                    className={activeId === id ? 'active' : ''}
-                    key={id}
-                    type="button"
-                    onClick={() => chooseDashboard(id)}
-                  >
-                    <span>{dashboards[id].title}</span>
-                    <small>{dashboards[id].description}</small>
-                  </button>
-                ))}
-              </div>
-            </details>
+        <div className="workspace-label">
+          <span>Operations desk</span>
+          <small>Supply chain / Europe</small>
+        </div>
+        <nav aria-label="Main navigation">
+          {pages.map((p) => (
+            <div key={p.name}>
+              {p.group && <p className="nav-group">{p.group}</p>}
+              <button
+                className={page === p.name ? 'active' : ''}
+                aria-current={page === p.name ? 'page' : undefined}
+                onClick={() => navigate(p.name)}
+              >
+                <p.icon size={18} />
+                <span>{pageLabel(p.name)}</span>
+                {p.name === 'Control Tower' && <span className="nav-dot" />}
+              </button>
+            </div>
           ))}
         </nav>
-
-        <div className="header-actions">
-          <span className="connection"><i /> Live data</span>
-          <button className="avatar" type="button" aria-label="Open profile">JB</button>
+        <div className="sidebar-footer">
+          <div className="demo-tag">
+            <span />
+            Historical synthetic data
+          </div>
+          <p>
+            Shipment history & stock projections.
+            <br />
+            For analysis and planning.
+          </p>
+          <a href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer">
+            Explore the API <ArrowUpRight size={14} />
+          </a>
         </div>
-      </header>
-
-      <main>
-        <section className="page-heading">
-          <div>
-            <span className="eyebrow">{config.eyebrow} intelligence</span>
-            <h1>{config.title}</h1>
-            <p>{config.description}</p>
-          </div>
-          <div className="heading-actions">
-            {lastUpdated && <span className="updated">Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>}
-            <button className="refresh-button" type="button" onClick={refreshDashboard} disabled={loading}>
-              <span aria-hidden="true">↻</span> Refresh
+      </aside>
+      {mobileMenu && (
+        <button
+          className="mobile-shade"
+          aria-label="Close navigation"
+          onClick={() => setMenu(false)}
+        />
+      )}
+      <div className="main-shell" inert={mobileMenu}>
+        <header className="topbar">
+          <div className="breadcrumb">
+            <button
+              className="mobile-toggle icon-button"
+              aria-label="Open navigation"
+              aria-expanded={mobileMenu}
+              aria-controls="workspace-navigation"
+              onClick={() => setMenu(true)}
+            >
+              <Menu size={20} />
             </button>
+            <Package size={16} />
+            <span>Supply chain</span>
+            <ChevronRight size={13} />
+            <strong>{pageLabel(page)}</strong>
           </div>
-        </section>
-
-        {error ? (
-          <section className="error-state" role="alert">
-            <span className="error-icon">!</span>
+          <div className="topbar-right">
+            <span className="edition-label">Operations / BillgerICT</span>
+          </div>
+        </header>
+        <main>
+          <div className="page-heading">
             <div>
-              <h2>We could not reach the data service</h2>
-              <p>{error}. Confirm that the FastAPI service is running and try again.</p>
+              <span className="eyebrow">
+                BILLGERICT /{' '}
+                {page === 'Control Tower' ? 'EXECUTIVE OVERVIEW' : 'DECISION WORKSPACE'}
+              </span>
+              <h1>{pageLabel(page)}</h1>
+              <p>{config.description}</p>
             </div>
-            <button type="button" onClick={refreshDashboard}>Try again</button>
-          </section>
-        ) : (
-          <>
-            <section className="metrics-grid" aria-label="Key performance indicators">
-              {loading
-                ? Array.from({ length: 4 }, (_, index) => <div className="metric-card skeleton" key={index} />)
-                : metrics.map(([key, value], index) => (
-                    <article className="metric-card" key={key}>
-                      <div className="metric-topline">
-                        <span>{formatLabel(key)}</span>
-                        <span className={`metric-icon metric-icon-${index + 1}`} aria-hidden="true">
-                          {index === 0 ? '↗' : index === 1 ? '◫' : index === 2 ? '◎' : '◇'}
-                        </span>
-                      </div>
-                      <strong>{formatValue(value, key)}</strong>
-                      <small>{typeof value === 'object' ? 'Distribution across records' : 'Current operational value'}</small>
-                      {typeof value === 'number' && key.includes('percent') && (
-                        <span className="progress"><i style={{ width: `${Math.min(Math.max(value, 0), 100)}%` }} /></span>
-                      )}
-                    </article>
-                  ))}
-            </section>
-
-            <section className="data-panel">
-              <div className="panel-heading">
+            {overview.data && (
+              <div className="snapshot-label">
+                <Database size={16} />
                 <div>
-                  <h2>Operational details</h2>
-                  <p>{data ? `${formatValue(data.summary.returned_records)} of ${formatValue(data.summary.total_records)} records shown` : 'Loading records…'}</p>
+                  <strong>
+                    {overview.data.source.offline
+                      ? 'Saved PostgreSQL snapshot'
+                      : 'PostgreSQL analytical snapshot'}
+                  </strong>
+                  <span>Inventory as of {date(overview.data.as_of)}</span>
                 </div>
-                <span className="source-label">Source · {data?.view ?? 'connecting'}</span>
               </div>
-
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      {config.columns.map((column) => <th key={column.path}>{column.label}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading
-                      ? Array.from({ length: 6 }, (_, row) => (
-                          <tr className="loading-row" key={row}>
-                            {config.columns.map((column) => <td key={column.path}><span /></td>)}
-                          </tr>
-                        ))
-                      : data?.items.slice(0, 12).map((item, rowIndex) => (
-                          <tr key={rowIndex}>
-                            {config.columns.map((column) => {
-                              const value = getValue(item, column.path)
-                              return (
-                                <td key={column.path}>
-                                  {column.tone ? <span className={`status status-${String(value).toLowerCase().replaceAll(' ', '-')}`}>{formatValue(value, column.path)}</span> : formatValue(value, column.path)}
-                                </td>
-                              )
-                            })}
-                          </tr>
-                        ))}
-                    {!loading && data?.items.length === 0 && (
-                      <tr><td className="empty-row" colSpan={config.columns.length}>No records are available for this view.</td></tr>
+            )}
+          </div>
+          <State {...overview} />
+          {overview.data && (
+            <Suspense fallback={<State loading error={null} />}>
+              <>
+                {page === 'Control Tower' && (
+                  <>
+                    {exceptions.error ? (
+                      <State {...exceptions} />
+                    ) : (
+                      <Overview
+                        data={overview.data}
+                        exceptions={exceptions.data?.items ?? []}
+                        navigate={navigate}
+                      />
                     )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </>
-        )}
-      </main>
+                  </>
+                )}
+                {page === 'Transportation' && (
+                  <Transportation
+                    key={`${page}-${reference}`}
+                    reference={reference}
+                    navigate={navigate}
+                  />
+                )}
+                {page === 'Inventory' && (
+                  <Inventory
+                    key={`${page}-${reference}`}
+                    reference={reference}
+                    navigate={navigate}
+                  />
+                )}
+                {page === 'Demand' && (
+                  <Demand key={`${page}-${reference}`} reference={reference} navigate={navigate} />
+                )}
+                {page === 'Suppliers' && <Suppliers />}
+                {page === 'Production' && <Production />}
+                {page === 'AI / ML Insights' && <Models overview={overview.data} />}
+                {page === 'Scenario Analysis' && (
+                  <Scenarios key={`${page}-${reference}`} reference={reference} />
+                )}
+              </>
+            </Suspense>
+          )}
+          <footer className="page-footer">
+            <span>BillgerICT · Intelligent control tower</span>
+            <span>Supply chain analysis</span>
+          </footer>
+        </main>
+      </div>
     </div>
   )
 }
-
 export default App

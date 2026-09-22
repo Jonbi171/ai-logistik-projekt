@@ -1,2 +1,12 @@
 /notes/models
 .DS_STORE
+.DS_Store
+**/__pycache__/
+backend/venv/
+frontend/node_modules/
+frontend/dist/
+backend/database/database.ini
+.env
+backend/artifacts/
+*.tsbuildinfo
+test-results/

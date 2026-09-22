@@ -1,0 +1,7 @@
+[postgresql]
+host = your-postgres-host
+port = 5432
+dbname = your-database
+user = your-read-only-user
+password = your-password
+sslmode = require
