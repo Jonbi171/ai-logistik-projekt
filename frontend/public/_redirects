@@ -1,0 +1,2 @@
+/api/*  https://ai-logistik-projekt.onrender.com/:splat  200
+/api-docs  https://ai-logistik-projekt.onrender.com/docs  302

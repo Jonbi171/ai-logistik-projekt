@@ -172,7 +172,11 @@ function App() {
             <br />
             For analysis and planning.
           </p>
-          <a href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer">
+          <a
+            href={import.meta.env.DEV ? 'http://127.0.0.1:8000/docs' : '/api-docs'}
+            target="_blank"
+            rel="noreferrer"
+          >
             Explore the API <ArrowUpRight size={14} />
           </a>
         </div>
